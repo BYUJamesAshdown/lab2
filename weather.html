@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+	<head>
+		<script
+			type="text/javascript"
+			src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+		</script>
+		<script>
+			$(document).ready(function() {
+				$("#cityField").keyup(function() {
+					var input = toCapitalize($("#cityField").val());
+					var url = "http://bioresearch.byu.edu/cs260/jquery/getcity.cgi?q=" + input;
+					console.log(url);
+					$.getJSON(url, function(data) {
+						var list = "<ul>";
+						$.each(data, function(i, item) {
+							list += "<li>" + data[i].city + "</li>";
+						});
+						list += "</ul>";
+						$("#suggestions").html(list);
+					})
+					.fail(function() {
+						$("#suggestions").html("");
+					});
+				});
+				
+				$("#submitWeather").click(function(e) {
+					var city = $("#cityField").val();
+					$("#city").text(city);
+					var url = "https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=4f39bf857dd7bb53adbedd09c9b488e3&q=" + city;
+					console.log(url);
+					$.getJSON(url, function(data) {
+						var location = data['name'];
+						var weather = data['weather'][0]['main'];
+						var temp = data['main']['temp'];
+						var weather_icon = data['weather'][0]['icon'];
+						var humidity = data['main']['humidity'];
+						var temp_min = data['main']['temp_min'];
+						var temp_max = data['main']['temp_max'];
+						var wind_speed = data['wind']['speed'];
+						var everything = "<img src=\"http://openweathermap.org/img/w/" + weather_icon + ".png\">";
+						console.log(everything);
+						everything += "<ul>";
+						everything += "<li>Location: " + location;
+						everything += "<li>Weather: " + weather + " (" + temp + "&#8457;)";
+						everything += "<li>Low: " + temp_min + "&#8457; | High: " + temp_max + "&#8457;";
+						everything += "<li>Humidity: " + humidity + "%";
+						everything += "<li>Wind: " + wind_speed + " mph";
+						everything += "</ul>";
+						$("#weather").html(everything);
+					})
+					.fail(function() {
+						$("#weather").html("No weather");
+					});
+					e.preventDefault();
+					
+				});
+				
+				$("#submitSearch").click(function(e) {
+					e.preventDefault();
+					var searchTerm = $("#searchTerm").val();
+					var url = "https://api.stackexchange.com/2.2/search?order=desc&sort=activity&site=stackoverflow&intitle=" + searchTerm;
+					console.log(url);
+					$.getJSON(url, function(data) {
+						var results = "<ul>";
+						console.log(data);
+						$.each(data['items'], function(i, item) {
+							//console.log(item['title']);
+							results += "<li>"
+							console.log(item['link']);
+							results += "<a href=\"" + item['link'] + "\">";
+							results += item['title'];
+							results += "</a>";
+						});
+						results += "</ul>";
+						$("#searchResults").html(results);
+					});
+				});
+			});
+			
+			function toCapitalize(string) {
+				return string.charAt(0).toUpperCase() + string.toLowerCase().slice(1);
+			}
+		</script>
+	</head>
+	<body>
+	  
+		<h1>Weather</h1>
+		<form>
+			Enter a Utah City: <input id="cityField" type="text" name=""/>
+			<input id="submitWeather" type="submit" value="Submit"/>
+			<div>Suggestions:</div>
+			<div id="suggestions"></div>
+			<div>City</div>
+			<div><textarea id="city">No city</textarea></div>
+			<div>Current Weather</div>
+			<div id="weather">No weather</div>
+		</form>
+		
+		<h1>StackExchange</h1>
+		<form>
+			Enter a search term: <input id="searchTerm" type="text" name=""/>
+			<input id="submitSearch" type="submit" value="Submit"/>
+			<div id="searchResults"></div>
+		</form>
+		
+	</body>
+</html>
+
+http://ec2-107-21-37-166.compute-1.amazonaws.com/lab2/%22https://stackoverflow.com/questions/52544293/how-does-java-find-spark-hadoop-and-aws-jars-in-intellij
